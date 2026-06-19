@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FHBM</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@300;400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0e0f11;--paper:#f5f3ef;--cream:#edeae3;--tan:#ddd8cd;
+  --mid:#8a8378;--accent:#1a3a5c;--white:#ffffff;--r:8px;
+  --mono:'Geist Mono',monospace;--sans:'Geist',sans-serif;--serif:'Instrument Serif',Georgia,serif;
+}
+[data-theme="dark"]{
+  --ink:#e8e6e1;--paper:#0f1117;--cream:#1a1d27;--tan:#2a2d3a;
+  --mid:#7a7a8a;--accent:#5b8fd4;--white:#1a1d27;
+}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);min-height:100vh;display:flex;align-items:center;justify-content:center}
+.wrap{max-width:420px;width:100%;padding:24px;text-align:center}
+.brand-mark{width:64px;height:64px;border-radius:14px;background:var(--ink);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 18px}
+.brand-name{font-family:var(--serif);font-size:34px;font-style:italic;letter-spacing:-.02em;margin-bottom:6px}
+.brand-sub{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mid);margin-bottom:40px}
+.link-card{display:flex;align-items:center;gap:16px;background:var(--white);border:1px solid var(--tan);border-radius:14px;padding:20px;text-decoration:none;color:var(--ink);margin-bottom:14px;transition:transform .15s,box-shadow .15s}
+.link-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.08)}
+.link-ico{font-size:28px;width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:var(--cream);border-radius:10px;flex-shrink:0}
+.link-text{text-align:left}
+.link-title{font-weight:600;font-size:16px;margin-bottom:2px}
+.link-sub{font-size:12px;color:var(--mid)}
+.theme-toggle{position:fixed;top:16px;right:16px;background:var(--cream);border:1px solid var(--tan);border-radius:20px;padding:6px 12px;font-family:var(--mono);font-size:11px;color:var(--mid);cursor:pointer;}
+</style>
+</head>
+<body>
+<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
+<div class="wrap">
+  <div class="brand-mark">☕</div>
+  <div class="brand-name">FHBM</div>
+  <div class="brand-sub">From Here By Mike</div>
+
+  <a class="link-card" href="index.html">
+    <div class="link-ico">📋</div>
+    <div class="link-text">
+      <div class="link-title">Briefing Sheet</div>
+      <div class="link-sub">Roster, occupancy, sections & comments</div>
+    </div>
+  </a>
+
+  <a class="link-card" href="late.html">
+    <div class="link-ico">⏰</div>
+    <div class="link-text">
+      <div class="link-title">Suivi des retards</div>
+      <div class="link-sub">Cocher et suivre les retards par mois</div>
+    </div>
+  </a>
+</div>
+<script>
+function toggleTheme(){
+  const html=document.documentElement;
+  const isDark=html.getAttribute('data-theme')==='dark';
+  html.setAttribute('data-theme',isDark?'light':'dark');
+  document.getElementById('themeToggle').textContent=isDark?'🌙 Dark':'☀️ Light';
+  try{localStorage.setItem('fhbm_theme',isDark?'light':'dark');}catch(e){}
+}
+try{
+  if(localStorage.getItem('fhbm_theme')==='dark'){
+    document.documentElement.setAttribute('data-theme','dark');
+    document.getElementById('themeToggle').textContent='☀️ Light';
+  }
+}catch(e){}
+</script>
+</body>
+</html>
