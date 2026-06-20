@@ -1,1 +1,363 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FHBM</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@300;400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0e0f11;--paper:#f5f3ef;--cream:#edeae3;--tan:#ddd8cd;
+  --mid:#8a8378;--ghost:#b8b2a8;--accent:#1a3a5c;--gold:#b8860b;
+  --white:#ffffff;--r:8px;
+  --mono:'Geist Mono',monospace;--sans:'Geist',sans-serif;--serif:'Instrument Serif',Georgia,serif;
+}
+[data-theme="dark"]{
+  --ink:#e8e6e1;--paper:#0f1117;--cream:#1a1d27;--tan:#2a2d3a;
+  --mid:#7a7a8a;--ghost:#4a4a5a;--accent:#5b8fd4;--gold:#d4af37;--white:#1a1d27;
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--paper);color:var(--ink);font-family:var(--sans);min-height:100vh;
+  display:flex;align-items:center;justify-content:center;position:relative;overflow-x:hidden;
+}
+
+/* Subtle ambient backdrop — soft radial glow, no gradients on text/cards */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(circle at 18% 15%, color-mix(in srgb, var(--accent) 7%, transparent), transparent 45%),
+    radial-gradient(circle at 85% 80%, color-mix(in srgb, var(--gold) 6%, transparent), transparent 45%);
+}
+
+.theme-toggle{position:fixed;top:18px;right:18px;z-index:200;background:var(--white);border:1px solid var(--tan);border-radius:20px;padding:7px 14px;font-family:var(--mono);font-size:11px;color:var(--mid);cursor:pointer;transition:all .2s;}
+.theme-toggle:hover{border-color:var(--accent);color:var(--accent)}
+
+.wrap{max-width:480px;width:100%;padding:32px 24px;text-align:center;position:relative;z-index:1}
+
+.brand-mark{
+  width:72px;height:72px;border-radius:18px;background:var(--ink);
+  display:flex;align-items:center;justify-content:center;font-size:30px;
+  margin:0 auto 22px;box-shadow:0 8px 28px -8px color-mix(in srgb, var(--ink) 45%, transparent);
+  animation:rise .6s cubic-bezier(.2,.8,.2,1) both;
+}
+.brand-name{
+  font-family:var(--serif);font-size:40px;font-style:italic;letter-spacing:-.02em;
+  margin-bottom:6px;line-height:1;animation:rise .6s cubic-bezier(.2,.8,.2,1) .05s both;
+}
+.brand-sub{
+  font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--mid);margin-bottom:6px;animation:rise .6s cubic-bezier(.2,.8,.2,1) .1s both;
+}
+.brand-rule{
+  width:36px;height:1px;background:var(--gold);margin:0 auto 44px;opacity:.7;
+  animation:rise .6s cubic-bezier(.2,.8,.2,1) .15s both;
+}
+
+.links{display:flex;flex-direction:column;gap:12px}
+.link-card{
+  display:flex;align-items:center;gap:16px;background:var(--white);
+  border:1px solid var(--tan);border-radius:16px;padding:18px 20px;
+  text-decoration:none;color:var(--ink);position:relative;overflow:hidden;
+  transition:transform .25s cubic-bezier(.2,.8,.2,1),border-color .25s,box-shadow .25s;
+  animation:rise .6s cubic-bezier(.2,.8,.2,1) both;
+}
+.link-card:nth-child(1){animation-delay:.26s}
+.link-card:nth-child(2){animation-delay:.34s}
+.link-card:nth-child(3){animation-delay:.42s}
+.link-card:nth-child(4){animation-delay:.5s}
+
+.link-card::after{
+  content:'';position:absolute;inset:0;border-radius:16px;
+  background:linear-gradient(120deg, transparent 30%, color-mix(in srgb, var(--accent) 6%, transparent) 50%, transparent 70%);
+  transform:translateX(-100%);transition:transform .6s ease;
+}
+.link-card:hover::after{transform:translateX(100%)}
+.link-card:hover{
+  transform:translateY(-3px);border-color:color-mix(in srgb, var(--accent) 40%, var(--tan));
+  box-shadow:0 14px 32px -16px color-mix(in srgb, var(--ink) 25%, transparent);
+}
+.link-card:active{transform:translateY(-1px)}
+
+.link-ico{
+  font-size:24px;width:50px;height:50px;display:flex;align-items:center;justify-content:center;
+  background:var(--cream);border-radius:13px;flex-shrink:0;transition:transform .25s,background .25s;
+}
+.link-card:hover .link-ico{transform:scale(1.08) rotate(-4deg)}
+.link-text{text-align:left;flex:1}
+.link-title{font-weight:600;font-size:16px;margin-bottom:2px;letter-spacing:-.01em}
+.link-sub{font-size:12.5px;color:var(--mid);line-height:1.4}
+.link-arrow{font-family:var(--mono);font-size:14px;color:var(--ghost);transition:transform .25s,color .25s}
+.link-card:hover .link-arrow{transform:translateX(3px);color:var(--accent)}
+
+.footer-note{
+  margin-top:36px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;
+  color:var(--ghost);animation:rise .6s cubic-bezier(.2,.8,.2,1) .36s both;
+}
+
+.week-card{
+  background:var(--white);border:1px solid var(--tan);border-radius:16px;
+  padding:16px 18px 14px;margin-bottom:14px;text-align:left;
+  animation:rise .6s cubic-bezier(.2,.8,.2,1) .14s both;
+}
+.week-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.week-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600}
+.week-title-ico{font-size:15px}
+.week-count{
+  font-family:var(--mono);font-size:10.5px;color:var(--accent);
+  background:color-mix(in srgb, var(--accent) 10%, transparent);
+  padding:2px 9px;border-radius:20px;
+}
+.week-list{display:flex;flex-direction:column;gap:7px}
+.week-row{
+  display:flex;align-items:center;gap:10px;padding:7px 9px;border-radius:10px;
+  background:var(--paper);transition:background .2s;
+}
+.week-row.is-today{background:color-mix(in srgb, var(--gold) 10%, var(--paper));border:1px solid color-mix(in srgb, var(--gold) 30%, transparent)}
+.week-day{
+  font-family:var(--mono);font-size:10px;font-weight:600;color:var(--mid);
+  min-width:34px;text-align:center;line-height:1.2;
+}
+.week-day .num{display:block;font-size:13px;color:var(--ink)}
+.week-row.is-today .week-day,.week-row.is-today .week-day .num{color:var(--gold)}
+.week-info{flex:1;min-width:0}
+.week-topic{font-size:12.5px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.week-who{font-family:var(--mono);font-size:10px;color:var(--mid);margin-top:1px}
+.week-empty{
+  font-size:12.5px;color:var(--mid);padding:10px 4px;text-align:center;
+}
+.week-empty a{color:var(--accent);text-decoration:none;font-weight:600}
+
+.inc-card{
+  background:var(--white);border:1px solid var(--tan);border-radius:16px;
+  padding:16px 18px 14px;margin-bottom:14px;text-align:left;
+  animation:rise .6s cubic-bezier(.2,.8,.2,1) .18s both;
+}
+.inc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.inc-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600}
+.inc-title-ico{font-size:15px}
+.inc-tag{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--gold);background:color-mix(in srgb, var(--gold) 12%, transparent);
+  padding:2px 9px;border-radius:20px;
+}
+.inc-body{padding:9px 11px;border-radius:10px;background:var(--paper)}
+.inc-challenge{font-size:13px;font-weight:600;line-height:1.35;margin-bottom:5px}
+.inc-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.inc-pill{
+  font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:14px;
+  background:var(--white);border:1px solid var(--tan);color:var(--mid);
+}
+.inc-pill.prize{background:var(--gold);color:#fff;border-color:var(--gold)}
+.inc-winner{
+  margin-top:8px;display:flex;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:11px;color:var(--mid);
+}
+.inc-winner b{color:var(--ink)}
+
+@keyframes rise{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+@media(max-width:400px){
+  .wrap{padding:24px 18px}
+  .brand-name{font-size:34px}
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
+<div class="wrap">
+  <div class="brand-mark">☕</div>
+  <div class="brand-name">FHBM</div>
+  <div class="brand-sub">From Here By Mike</div>
+  <div class="brand-rule"></div>
+
+  <div class="week-card" id="weekCard">
+    <div class="week-head">
+      <div class="week-title"><span class="week-title-ico">🎓</span> This week's trainings</div>
+      <span class="week-count" id="weekCount">···</span>
+    </div>
+    <div class="week-list" id="weekList">
+      <div class="week-empty">Loading…</div>
+    </div>
+  </div>
+
+  <div class="inc-card" id="incCard">
+    <div class="inc-head">
+      <div class="inc-title"><span class="inc-title-ico">🏆</span> Today's incentive</div>
+      <span class="inc-tag" id="incTag">···</span>
+    </div>
+    <div id="incBody"><div class="week-empty">Loading…</div></div>
+  </div>
+
+  <div class="links">
+    <a class="link-card" href="briefing.html">
+      <div class="link-ico">📋</div>
+      <div class="link-text">
+        <div class="link-title">Briefing Sheet</div>
+        <div class="link-sub">Roster, occupancy, sections &amp; comments</div>
+      </div>
+      <div class="link-arrow">→</div>
+    </a>
+
+    <a class="link-card" href="late.html">
+      <div class="link-ico">⏰</div>
+      <div class="link-text">
+        <div class="link-title">Late Tracker</div>
+        <div class="link-sub">Check and track lates by month</div>
+      </div>
+      <div class="link-arrow">→</div>
+    </a>
+
+    <a class="link-card" href="training.html">
+      <div class="link-ico">🎓</div>
+      <div class="link-text">
+        <div class="link-title">Evening Training</div>
+        <div class="link-sub">Schedule the daily 5-min briefing training</div>
+      </div>
+      <div class="link-arrow">→</div>
+    </a>
+
+    <a class="link-card" href="incentives.html">
+      <div class="link-ico">🏆</div>
+      <div class="link-text">
+        <div class="link-title">Sales Incentives</div>
+        <div class="link-sub">Daily &amp; monthly staff challenges</div>
+      </div>
+      <div class="link-arrow">→</div>
+    </a>
+  </div>
+
+  <div class="footer-note">FHBM OPERATIONS · INTERNAL USE</div>
+</div>
+<script>
+function toggleTheme(){
+  const html=document.documentElement;
+  const isDark=html.getAttribute('data-theme')==='dark';
+  html.setAttribute('data-theme',isDark?'light':'dark');
+  document.getElementById('themeToggle').textContent=isDark?'🌙 Dark':'☀️ Light';
+  try{localStorage.setItem('fhbm_theme',isDark?'light':'dark');}catch(e){}
+}
+try{
+  if(localStorage.getItem('fhbm_theme')==='dark'){
+    document.documentElement.setAttribute('data-theme','dark');
+    document.getElementById('themeToggle').textContent='☀️ Light';
+  }
+}catch(e){}
+
+// ─── This week's trainings (read-only summary from shared JSONBin) ───────
+const TRAINING_BIN_ID = '6a36645fda38895dfee23649';
+const TRAINING_BIN_KEY = '$2a$10$uXqOEodSKDCHXwyTUseWQOubVplrHFgSPQCp65ufeKqxZmDp.mAfi';
+const TRAINING_BIN_URL = 'https://api.jsonbin.io/v3/b/'+TRAINING_BIN_ID;
+
+function todayISO(){ return new Date().toISOString().split('T')[0]; }
+function addDays(iso, n){
+  const d = new Date(iso+'T00:00:00');
+  d.setDate(d.getDate()+n);
+  return d.toISOString().split('T')[0];
+}
+function dayShort(iso){
+  const d = new Date(iso+'T00:00:00');
+  return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()];
+}
+function dayNum(iso){
+  return new Date(iso+'T00:00:00').getDate();
+}
+
+async function loadWeekTrainings(){
+  const listEl = document.getElementById('weekList');
+  const countEl = document.getElementById('weekCount');
+  try{
+    const resp = await fetch(TRAINING_BIN_URL+'/latest', { headers: { 'X-Master-Key': TRAINING_BIN_KEY } });
+    if(!resp.ok) throw new Error('fetch failed');
+    const data = await resp.json();
+    const all = (data.record && data.record.trainings) || [];
+
+    const today = todayISO();
+    const weekEnd = addDays(today, 6);
+    const weekItems = all
+      .filter(t => t.date >= today && t.date <= weekEnd)
+      .sort((a,b) => a.date.localeCompare(b.date));
+
+    countEl.textContent = weekItems.length + (weekItems.length===1 ? ' planned' : ' planned');
+
+    if(!weekItems.length){
+      listEl.innerHTML = '<div class="week-empty">Nothing scheduled this week, <a href="training.html">add one →</a></div>';
+      return;
+    }
+
+    listEl.innerHTML = weekItems.map(t => {
+      const isToday = t.date === today;
+      return `<div class="week-row ${isToday?'is-today':''}">
+        <div class="week-day">${dayShort(t.date)}<span class="num">${dayNum(t.date)}</span></div>
+        <div class="week-info">
+          <div class="week-topic">${escHtml(t.topic)}</div>
+          <div class="week-who">${escHtml(t.who)}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+  }catch(e){
+    countEl.textContent = '';
+    listEl.innerHTML = '<div class="week-empty">Could not load trainings. <a href="training.html">Open Training →</a></div>';
+  }
+}
+function escHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+loadWeekTrainings();
+
+// ─── Today's incentive (read-only summary from shared JSONBin) ───────────
+const INCENTIVES_BIN_ID = '6a36648bda38895dfee236d7';
+const INCENTIVES_BIN_KEY = '$2a$10$uXqOEodSKDCHXwyTUseWQOubVplrHFgSPQCp65ufeKqxZmDp.mAfi';
+const INCENTIVES_BIN_URL = 'https://api.jsonbin.io/v3/b/'+INCENTIVES_BIN_ID;
+
+async function loadTodayIncentive(){
+  const bodyEl = document.getElementById('incBody');
+  const tagEl = document.getElementById('incTag');
+  try{
+    const resp = await fetch(INCENTIVES_BIN_URL+'/latest', { headers: { 'X-Master-Key': INCENTIVES_BIN_KEY } });
+    if(!resp.ok) throw new Error('fetch failed');
+    const data = await resp.json();
+    const rec = data.record || {};
+    const today = todayISO();
+    const dow = new Date(today+'T00:00:00').getDay();
+
+    let item = null, tag = 'Daily';
+    if(dow === 0 || dow === 6){
+      item = (rec.breakfast||[]).find(i => i.date === today);
+      tag = 'Breakfast';
+    }
+    if(!item){
+      item = (rec.daily||[]).find(i => i.date === today);
+      tag = 'Daily';
+    }
+
+    if(!item){
+      tagEl.textContent = '';
+      bodyEl.innerHTML = '<div class="week-empty">No challenge today, <a href="incentives.html">launch one →</a></div>';
+      return;
+    }
+
+    tagEl.textContent = tag;
+    bodyEl.innerHTML = `<div class="inc-body">
+      <div class="inc-challenge">${escHtml(item.challenge)}</div>
+      <div class="inc-meta">
+        <span class="inc-pill">by ${escHtml(item.who)}</span>
+        <span class="inc-pill prize">🎁 ${escHtml(item.prize)}</span>
+      </div>
+      ${item.winner ? `<div class="inc-winner">🏅 Winner: <b>${escHtml(item.winner)}</b></div>` : ''}
+    </div>`;
+
+  }catch(e){
+    tagEl.textContent = '';
+    bodyEl.innerHTML = '<div class="week-empty">Could not load incentives. <a href="incentives.html">Open Incentives →</a></div>';
+  }
+}
+loadTodayIncentive();
+</script>
+</body>
+</html>
